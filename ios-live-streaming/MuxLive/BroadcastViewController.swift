@@ -5,6 +5,7 @@ import HaishinKit
 import AVFoundation
 import VideoToolbox
 import Loaf
+import WebKit
 
 class BroadcastViewController: UIViewController, RTMPStreamDelegate {
     
@@ -17,6 +18,9 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
     // Go Live Button
     @IBOutlet weak var startStopButton: UIButton!
     
+    //webview container
+    @IBOutlet weak var webViewContainer: UIView!
+    
     // FPS and Bitrate Labels
     @IBOutlet weak var fpsLabel: UILabel!
     @IBOutlet weak var bitrateLabel: UILabel!
@@ -26,7 +30,7 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
     private var rtmpStream: RTMPStream!
 
     // Default Camera
-    private var defaultCamera: AVCaptureDevice.Position = .back
+    private var defaultCamera: AVCaptureDevice.Position = .front
     
     // Flag indicates if we should be attempting to go live
     private var liveDesired = false
@@ -36,6 +40,8 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
     
     // The RTMP Stream key to broadcast to.
     public var streamKey: String!
+    
+    public var webUrl: String = ""
     
     // The Preset to use
     public var preset: Preset!
@@ -118,7 +124,7 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
     // Publishes the live stream
     private func publishStream() {
         print("Calling publish()")
-        rtmpStream.publish(self.streamKey)
+//        rtmpStream.publish(self.streamKey)
         
         DispatchQueue.main.async {
             self.startStopButton.setTitle("Stop Streaming!", for: .normal)
@@ -136,7 +142,8 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
         
         print("Broadcast View Controller Init")
         
-        print("Stream Key: " + streamKey)
+//        print("Stream Key: " + streamKey)
+        loadWebView()
         
         // Work out the orientation of the device, and set this on the RTMP Stream
         rtmpStream = RTMPStream(connection: rtmpConnection)
@@ -321,11 +328,26 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
     func rtmpStreamDidClear(_ stream: RTMPStream) {
     }
     
+    //loading webview based on URL
+    func loadWebView(){
+        if !webUrl.isEmpty {
+            let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: webViewContainer.frame.height))
+            let myURL = URL(string:"https://www.apple.com")
+            let myRequest = URLRequest(url: myURL!)
+            webView.load(myRequest)
+            webViewContainer.addSubview(webView)
+            
+        }else{
+            DispatchQueue.main.async {
+                Loaf("Invalid WEB URL.Could not load the webpage!! ", state: Loaf.State.error, location: .top,  sender: self).show(.short)
+            }
+        }
+    }
     // Statistics callback
     func rtmpStream(_ stream: RTMPStream, didStatics connection: RTMPConnection) {
         DispatchQueue.main.async {
-            self.fpsLabel.text = String(stream.currentFPS) + " fps"
-            self.bitrateLabel.text = String((connection.currentBytesOutPerSecond / 125)) + " kbps"
+//            self.fpsLabel.text = String(stream.currentFPS) + " fps"
+//            self.bitrateLabel.text = String((connection.currentBytesOutPerSecond / 125)) + " kbps"
         }
     }
     

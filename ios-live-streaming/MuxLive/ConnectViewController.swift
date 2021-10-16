@@ -7,7 +7,7 @@ import Loaf
 class ConnectViewController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var streamKeyTextBox: MuxTextField!
-    @IBOutlet weak var presetSelector: UISegmentedControl!
+//    @IBOutlet weak var presetSelector: UISegmentedControl!
     @IBOutlet weak var startCameraButton: MuxButton!
     
     // If you're testing in a tight loop, you won't want to paste a stream key each time.
@@ -37,8 +37,8 @@ class ConnectViewController: UIViewController, UITextFieldDelegate {
         if segue.destination is BroadcastViewController
         {
             let vc = segue.destination as? BroadcastViewController
-            vc?.streamKey = streamKey
-            vc?.preset = segmentedPresets[presetSelector.selectedSegmentIndex]
+            vc?.webUrl = streamKey
+            vc?.preset = segmentedPresets[2]
         }
     }
     
@@ -52,7 +52,7 @@ class ConnectViewController: UIViewController, UITextFieldDelegate {
         }
         
         if streamKey == "" {
-            Loaf("Enter a Stream Key!", state: Loaf.State.warning, location: .top,  sender: self).show(.short)
+            Loaf("Enter a Valid Webpage URL!", state: Loaf.State.warning, location: .top,  sender: self).show(.short)
             return
         }
         
