@@ -226,10 +226,9 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
         case 0:
             rtmpStream.attachCamera(DeviceUtil.device(withPosition: AVCaptureDevice.Position.back))
         case 1:
-            rtmpStream.attachCamera(AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: AVMediaType.video, position: .front).devices.first
-)
-
-//            rtmpStream.attachCamera(DeviceUtil.device(withPosition: AVCaptureDevice.Position.front))
+//            rtmpStream.attachCamera(AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: AVMediaType.video, position: .front).devices.first
+//)
+            rtmpStream.attachCamera(DeviceUtil.device(withPosition: AVCaptureDevice.Position.front))
         default:
             rtmpStream.attachCamera(DeviceUtil.device(withPosition: defaultCamera))
         }
