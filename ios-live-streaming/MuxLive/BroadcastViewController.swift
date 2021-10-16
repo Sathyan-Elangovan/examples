@@ -8,7 +8,6 @@ import Loaf
 import WebKit
 
 class BroadcastViewController: UIViewController, RTMPStreamDelegate {
-    
     // Camera Preview View
     @IBOutlet private weak var previewView: MTHKView!
     
@@ -33,7 +32,7 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
     private var rtmpStream: RTMPStream!
 
     // Default Camera
-    private var defaultCamera: AVCaptureDevice.Position = .front
+    private var defaultCamera: AVCaptureDevice.Position = .back
     
     // Flag indicates if we should be attempting to go live
     private var liveDesired = false
@@ -160,30 +159,30 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
         } catch {
             print(error)
         }
-//        print("Stream Key: " + streamKey)
+        print("Stream Key: " + streamKey)
         loadWebView()
         
         // Work out the orientation of the device, and set this on the RTMP Stream
         rtmpStream = RTMPStream(connection: rtmpConnection)
-        
+
         // Get the orientation of the app, and set the video orientation appropriately
         if let orientation = UIApplication.shared.windows.first?.windowScene?.interfaceOrientation {
             let videoOrientation = DeviceUtil.videoOrientation(by: orientation)
             rtmpStream.orientation = videoOrientation!
         }
-        
+
         // And a listener for orientation changes
         // Note: Changing the orientation once the stream has been started will not change the orientation of the live stream, only the preview.
         NotificationCenter.default.addObserver(self, selector: #selector(on(_:)), name: UIDevice.orientationDidChangeNotification, object: nil)
-        
+
         // Configure the encoder profile
         configureStream(preset: self.preset)
-     
+
         // Attatch to the default audio device
         rtmpStream.attachAudio(AVCaptureDevice.default(for: .audio)) { error in
             print(error.description)
         }
-        
+
         // Attatch to the default camera
         rtmpStream.attachCamera(DeviceUtil.device(withPosition: defaultCamera)) { error in
             print(error.description)
@@ -193,17 +192,21 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
         previewView.addGestureRecognizer(tap)
         previewView.isUserInteractionEnabled = true
-        
+
         // Attatch the preview view
         previewView?.attachStream(rtmpStream)
-        
+
         // Add event listeners for RTMP status changes and IO Errors
         rtmpConnection.addEventListener(.rtmpStatus, selector: #selector(rtmpStatusHandler), observer: self)
         rtmpConnection.addEventListener(.ioError, selector: #selector(rtmpErrorHandler), observer: self)
-        
+
         rtmpStream.delegate = self
-                
+
 //        startStopButton.setTitle("Go Live!", for: .normal)
+        
+//        -------
+       
+        
     }
     
     // 👉📱 Tap to focus / exposure
@@ -223,7 +226,10 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
         case 0:
             rtmpStream.attachCamera(DeviceUtil.device(withPosition: AVCaptureDevice.Position.back))
         case 1:
-            rtmpStream.attachCamera(DeviceUtil.device(withPosition: AVCaptureDevice.Position.front))
+            rtmpStream.attachCamera(AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: AVMediaType.video, position: .front).devices.first
+)
+
+//            rtmpStream.attachCamera(DeviceUtil.device(withPosition: AVCaptureDevice.Position.front))
         default:
             rtmpStream.attachCamera(DeviceUtil.device(withPosition: defaultCamera))
         }

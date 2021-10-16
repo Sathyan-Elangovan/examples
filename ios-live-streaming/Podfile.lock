@@ -6,7 +6,7 @@ PODS:
   - Logboard (2.2.2)
 
 DEPENDENCIES:
-  - HaishinKit (~> 1.1.6)
+  - HaishinKit (~> 1.1.8)
   - Hue (~> 5.0.0)
   - Loaf
 
@@ -23,6 +23,6 @@ SPEC CHECKSUMS:
   Loaf: d69937cd00649f3fa260beb8b7aef0a1feb861ef
   Logboard: 0ab6bbd984ed032b3f0b615cef06779a73445c80
 
-PODFILE CHECKSUM: 705d09104dfc3dc8391c99353dca5d59100c58d6
+PODFILE CHECKSUM: c4266c06884b13d95b593f1f4658196bf12f6d30
 
 COCOAPODS: 1.11.2
