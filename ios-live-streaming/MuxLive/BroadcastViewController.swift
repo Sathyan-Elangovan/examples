@@ -12,6 +12,9 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
     // Camera Preview View
     @IBOutlet private weak var previewView: MTHKView!
     
+    var isRecordStarted: Bool = false
+    
+    
     // Camera Selector
     @IBOutlet weak var cameraSelector: UISegmentedControl!
     
@@ -39,7 +42,7 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
     private var reconnectAttempt = 0
     
     // The RTMP Stream key to broadcast to.
-    public var streamKey: String!
+    public var streamKey: String = "21b1ef64-1de3-4a33-92e9-6e938619b62a"
     
     public var webUrl: String = ""
     
@@ -124,8 +127,8 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
     // Publishes the live stream
     private func publishStream() {
         print("Calling publish()")
-//        rtmpStream.publish(self.streamKey)
-        
+        rtmpStream.publish(self.streamKey)
+//
         DispatchQueue.main.async {
             self.startStopButton.setTitle("Stop Streaming!", for: .normal)
         }
@@ -141,7 +144,22 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
         super.viewDidLoad()
         
         print("Broadcast View Controller Init")
-        
+        let session = AVAudioSession.sharedInstance()
+        do {
+             https://stackoverflow.com/questions/51010390/avaudiosession-setcategory-swift-4-2-ios-12-play-sound-on-silent
+            if #available(iOS 10.0, *) {
+                try session.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
+            } else {
+                session.perform(NSSelectorFromString("setCategory:withOptions:error:"), with: AVAudioSession.Category.playAndRecord, with: [
+                    AVAudioSession.CategoryOptions.allowBluetooth,
+                    AVAudioSession.CategoryOptions.defaultToSpeaker]
+                )
+                try session.setMode(.default)
+            }
+            try session.setActive(true)
+        } catch {
+            print(error)
+        }
 //        print("Stream Key: " + streamKey)
         loadWebView()
         
@@ -185,7 +203,7 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
         
         rtmpStream.delegate = self
                 
-        startStopButton.setTitle("Go Live!", for: .normal)
+//        startStopButton.setTitle("Go Live!", for: .normal)
     }
     
     // 👉📱 Tap to focus / exposure
@@ -240,6 +258,19 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
         }
     }
     
+    
+    //To start or stop screen record - new
+    
+    @IBAction func startStopRecording(_ sender: UIButton) {
+        
+        if isRecordStarted {
+            isRecordStarted = false
+            startStopButton.setTitle("Start Recording", for: .normal)
+        }else{
+            isRecordStarted = true
+            startStopButton.setTitle("Stop Recording", for: .normal)
+        }
+    }
     // Called when the RTMPStream or RTMPConnection changes status
     @objc
     private func rtmpStatusHandler(_ notification: Notification) {
