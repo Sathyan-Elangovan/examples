@@ -17,6 +17,8 @@
 		6AAAF210257564B7001AEA8E /* ConnectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AAAF20F257564B7001AEA8E /* ConnectViewController.swift */; };
 		6AAAF21425757538001AEA8E /* MuxTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AAAF21325757538001AEA8E /* MuxTextField.swift */; };
 		BF81AC273AF43F3812EF49A1 /* Pods_MuxLive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81485609C84C52F3B5EC0D46 /* Pods_MuxLive.framework */; };
+		C6635C85271BF045002A5921 /* DirectUploadResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6635C84271BF045002A5921 /* DirectUploadResponse.swift */; };
+		C6635C87271BF107002A5921 /* NewAssetSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6635C86271BF107002A5921 /* NewAssetSetting.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +35,8 @@
 		6AAAF21325757538001AEA8E /* MuxTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuxTextField.swift; sourceTree = "<group>"; };
 		81485609C84C52F3B5EC0D46 /* Pods_MuxLive.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MuxLive.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A845C096E2F42F6107C470D7 /* Pods-MuxLive.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MuxLive.debug.xcconfig"; path = "Target Support Files/Pods-MuxLive/Pods-MuxLive.debug.xcconfig"; sourceTree = "<group>"; };
+		C6635C84271BF045002A5921 /* DirectUploadResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectUploadResponse.swift; sourceTree = "<group>"; };
+		C6635C86271BF107002A5921 /* NewAssetSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewAssetSetting.swift; sourceTree = "<group>"; };
 		F8076D5757B1F7AB43F56A65 /* Pods-MuxLive.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MuxLive.release.xcconfig"; path = "Target Support Files/Pods-MuxLive/Pods-MuxLive.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -88,6 +92,8 @@
 				6A723F87256D5A140034280E /* Assets.xcassets */,
 				6A723F89256D5A140034280E /* LaunchScreen.storyboard */,
 				6A723F8C256D5A140034280E /* Info.plist */,
+				C6635C84271BF045002A5921 /* DirectUploadResponse.swift */,
+				C6635C86271BF107002A5921 /* NewAssetSetting.swift */,
 			);
 			path = MuxLive;
 			sourceTree = "<group>";
@@ -214,8 +220,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C6635C87271BF107002A5921 /* NewAssetSetting.swift in Sources */,
 				6AAAF21425757538001AEA8E /* MuxTextField.swift in Sources */,
 				6AAAF210257564B7001AEA8E /* ConnectViewController.swift in Sources */,
+				C6635C85271BF045002A5921 /* DirectUploadResponse.swift in Sources */,
 				6A22A247256D9CC800F98F38 /* MuxButton.swift in Sources */,
 				6A723F83256D5A120034280E /* BroadcastViewController.swift in Sources */,
 				6A723F7F256D5A120034280E /* AppDelegate.swift in Sources */,

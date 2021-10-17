@@ -9,7 +9,7 @@ import WebKit
 import ReplayKit
 import Alamofire
 
-class BroadcastViewController: UIViewController, RTMPStreamDelegate {
+class BroadcastViewController: UIViewController, RTMPStreamDelegate, RPPreviewViewControllerDelegate {
     // Camera Preview View
     @IBOutlet private weak var previewView: MTHKView!
     
@@ -292,16 +292,16 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
     }
     //To START SCREEN RECORD
     func startRecording() {
-            let recorder = RPScreenRecorder.shared()
 
-        recorder.startRecording(withMicrophoneEnabled: true) { [unowned self] (error) in
-                if let unwrappedError = error {
-                    print(unwrappedError.localizedDescription)
-                } else {
-                    print("Recording Started!!")
-//                    self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Stop", style: .Plain, target: self, action: "stopRecording")
-                }
-            }
+        let recorder = RPScreenRecorder.shared()
+        recorder.startRecording(withMicrophoneEnabled: true) {
+                   [unowned self] (error) in
+                   print(recorder)
+                   if let unwrappedError = error {
+                    print("Error")
+                       print(unwrappedError.localizedDescription)
+                   }
+               }
         }
     //TO STOP SCREEN RECORD
     func stopRecording() {
@@ -309,30 +309,54 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
         
            let recorder = RPScreenRecorder.shared()
         if #available(iOS 14.0, *) {
-            recorder.stopRecording(withOutput: outPutUrl!) { (error) in
-                guard error == nil else{
-                    print("Failed to save ")
-                    return
-                }
-                print("Following URL:")
-                print(outPutUrl)
-                if outPutUrl != nil{
-                    self.uploadScreenRecord(videoUrl: outPutUrl!)
+            let recorder = RPScreenRecorder.shared()
+            recorder.stopRecording {
+                       [unowned self] (preview, error) in
+                           if let unwrappedError = error {
+                               print(unwrappedError.localizedDescription)
+                           }
+
+                   if let unwrappedPreview = preview {
+                       print("end")
+                       unwrappedPreview.previewControllerDelegate = self
+                    unwrappedPreview.modalPresentationStyle=UIModalPresentationStyle.fullScreen
+                    self.present(unwrappedPreview, animated: true, completion: nil)
                 }
             }
         } else {
+            print("Fallback on earlier versions")
+
             // Fallback on earlier versions
         }
     }
-    var directUploadUrl = "https://storage.googleapis.com/video-storage-us-east1-uploads/fGnw7D5EAXvldL2hn1FnIKDloHZGcfvBALn00Mp55Upo?Expires=1634449158&GoogleAccessId=direct-uploads-writer-prod%40mux-cloud.iam.gserviceaccount.com&Signature=ZBs6YW7%2FHp8PiRMZjfrUyJ19tTzOWSciXux08ApgH9Hf6Cs9w7UiHG%2Fv1ETtMiWxKoiY57gwIdx02%2FlARn35sZ4v%2B1keUVn1%2BLqhX1sP7dx3JxyH0jDh1IMW3fJwuw81QsZmjb%2FNfDebyOcsu5k%2BLT3cr7BVnQmb%2BgaP6eow%2B72%2BF1Wpnfr4SwpyewfPO%2FpDqPARiOTZdIWIiPM2mYAzvPlvx44ALM5ar5tpOJ8V1%2BnukQ5BNfyB%2BgvjcvCVmSKERhJtdz1Pfha%2BWgg1m1tJx8FAZYB0upTnWdciGrYid%2Fbdy2RgS05J0YcT%2F%2FtybEU5%2FZSB3KQvUmzyhigwH37Khw%3D%3D&upload_id=ADPycduMF1RJ5geTNh8_dZPbLg-RErTnYfKHO2Hb1Y8imEn8UDn8SGy1z2dsiwvpUTcYrzBfoPGelINL5fm5urxJ6WrV4OfXyQ"
+//    var directUploadUrl = "{
+//        "data": {
+//            "url": "https://storage.googleapis.com/video-storage-us-east1-uploads/fGnw7D5EAXvldL2hn1FnIKDloHZGcfvBALn00Mp55Upo?Expires=1634449158&GoogleAccessId=direct-uploads-writer-prod%40mux-cloud.iam.gserviceaccount.com&Signature=ZBs6YW7%2FHp8PiRMZjfrUyJ19tTzOWSciXux08ApgH9Hf6Cs9w7UiHG%2Fv1ETtMiWxKoiY57gwIdx02%2FlARn35sZ4v%2B1keUVn1%2BLqhX1sP7dx3JxyH0jDh1IMW3fJwuw81QsZmjb%2FNfDebyOcsu5k%2BLT3cr7BVnQmb%2BgaP6eow%2B72%2BF1Wpnfr4SwpyewfPO%2FpDqPARiOTZdIWIiPM2mYAzvPlvx44ALM5ar5tpOJ8V1%2BnukQ5BNfyB%2BgvjcvCVmSKERhJtdz1Pfha%2BWgg1m1tJx8FAZYB0upTnWdciGrYid%2Fbdy2RgS05J0YcT%2F%2FtybEU5%2FZSB3KQvUmzyhigwH37Khw%3D%3D&upload_id=ADPycduMF1RJ5geTNh8_dZPbLg-RErTnYfKHO2Hb1Y8imEn8UDn8SGy1z2dsiwvpUTcYrzBfoPGelINL5fm5urxJ6WrV4OfXyQ",
+//            "timeout": 3600,
+//            "test": true,
+//            "status": "waiting",
+//            "new_asset_settings": {
+//                "playback_policies": [
+//                    "public"
+//                ],
+//                "mp4_support": "standard"
+//            },
+//            "id": "fGnw7D5EAXvldL2hn1FnIKDloHZGcfvBALn00Mp55Upo",
+//            "cors_origin": "https://example.com/"
+//        }
+//    }"
+    var preview : RPPreviewViewController?
+
+    var uploadObject = DirectUploadResponse.init()
     func uploadScreenRecord(videoUrl:URL){
-        print("uploadScreenRecord entered")
-        AF.upload(videoUrl, to: directUploadUrl, method: .put).responseJSON { response in
-            debugPrint(response)
-            print("Upload Print")
-            print(response)
-        }
-        
+//        print("uploadScreenRecord entered")
+//        print(uploadObject.data.url)
+//        AF.upload(videoUrl, to:uploadObject.data.url , method: .put).responseJSON { response in
+//            debugPrint(response)
+//            print("Upload Print")
+//            print(response)
+//        }
+       
     }
 //        recorder.stopRecording { [unowned self] (preview, error) in
 //
