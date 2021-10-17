@@ -311,25 +311,39 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate, RPPreviewVi
 //        }
     //TO STOP SCREEN RECORD
     func stopRecording() {
-        let outPutUrl = getTempURL()
+//        let outPutUrl = getTempURL()
 
            let recorder = RPScreenRecorder.shared()
-        if #available(iOS 14.0, *) {
-            recorder.stopRecording(withOutput: outPutUrl!) { (error) in
-                guard error == nil else{
-                    print("Failed to save ")
-                    return
-                }
-                
-                DispatchQueue.main.async {
-                    print("Recording stoppped")
-                    self.uploadScreenRecord(videoUrl: outPutUrl!)
-                }
-                
-                
+//        if #available(iOS 14.0, *) {
+//            recorder.stopRecording(withOutput: outPutUrl!) { (error) in
+//                guard error == nil else{
+//                    print("Failed to save ")
+//                    return
+//                }
+//
+//                DispatchQueue.main.async {
+//                    print("Recording stoppped")
+//                    self.uploadScreenRecord(videoUrl: outPutUrl!)
+//                }
+//
+//
+//            }
+//        } else {
+//            print("Earlier Versions")
+//        }
+        recorder.stopRecording { [unowned self] (preview, error) in
+                   print("Stopped recording")
+                   
+                   guard preview != nil else {
+                       print("Preview controller is not available.")
+                       return
+                   }
+            if let unwrappedPreview = preview {
+                    print("end")
+                    unwrappedPreview.previewControllerDelegate = self
+                    unwrappedPreview.modalPresentationStyle=UIModalPresentationStyle.fullScreen
+                    self.present(unwrappedPreview, animated: true, completion: nil)
             }
-        } else {
-            print("Earlier Versions")
         }
                 
 ////
@@ -340,6 +354,11 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate, RPPreviewVi
 //                    self.present(unwrappedPreview, animated: true, completion: nil)
     
         
+    }
+    
+    
+    func previewControllerDidFinish(_ previewController: RPPreviewViewController) {
+        dismiss(animated: true)
     }
 ////            -----
 //            recorder.stopRecording(withOutput: <#T##URL#>, completionHandler: <#T##((Error?) -> Void)?##((Error?) -> Void)?##(Error?) -> Void#>)
