@@ -9,5 +9,5 @@ target 'MuxLive' do
   pod 'HaishinKit', '~> 1.1.8'
   pod 'Hue', '~> 5.0.0'
   pod 'Loaf'
-
+  pod 'Alamofire', '~> 5.4'
 end

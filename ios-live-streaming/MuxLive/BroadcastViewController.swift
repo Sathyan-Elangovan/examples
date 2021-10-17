@@ -6,6 +6,8 @@ import AVFoundation
 import VideoToolbox
 import Loaf
 import WebKit
+import ReplayKit
+import Alamofire
 
 class BroadcastViewController: UIViewController, RTMPStreamDelegate {
     // Camera Preview View
@@ -271,11 +273,78 @@ class BroadcastViewController: UIViewController, RTMPStreamDelegate {
         if isRecordStarted {
             isRecordStarted = false
             startStopButton.setTitle("Start Recording", for: .normal)
+            stopRecording()
         }else{
             isRecordStarted = true
             startStopButton.setTitle("Stop Recording", for: .normal)
+            startRecording()
         }
     }
+    //  TO GET URL
+    func getTempURL() -> URL? {
+        let directory = NSTemporaryDirectory() as NSString
+            
+        if directory != "" {
+            let path = directory.appendingPathComponent(NSUUID().uuidString + ".mp4")
+            return URL(fileURLWithPath: path)
+        }
+        return nil
+    }
+    //To START SCREEN RECORD
+    func startRecording() {
+            let recorder = RPScreenRecorder.shared()
+
+        recorder.startRecording(withMicrophoneEnabled: true) { [unowned self] (error) in
+                if let unwrappedError = error {
+                    print(unwrappedError.localizedDescription)
+                } else {
+                    print("Recording Started!!")
+//                    self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Stop", style: .Plain, target: self, action: "stopRecording")
+                }
+            }
+        }
+    //TO STOP SCREEN RECORD
+    func stopRecording() {
+        let outPutUrl = getTempURL()
+        
+           let recorder = RPScreenRecorder.shared()
+        if #available(iOS 14.0, *) {
+            recorder.stopRecording(withOutput: outPutUrl!) { (error) in
+                guard error == nil else{
+                    print("Failed to save ")
+                    return
+                }
+                print("Following URL:")
+                print(outPutUrl)
+                if outPutUrl != nil{
+                    self.uploadScreenRecord(videoUrl: outPutUrl!)
+                }
+            }
+        } else {
+            // Fallback on earlier versions
+        }
+    }
+    var directUploadUrl = "https://storage.googleapis.com/video-storage-us-east1-uploads/fGnw7D5EAXvldL2hn1FnIKDloHZGcfvBALn00Mp55Upo?Expires=1634449158&GoogleAccessId=direct-uploads-writer-prod%40mux-cloud.iam.gserviceaccount.com&Signature=ZBs6YW7%2FHp8PiRMZjfrUyJ19tTzOWSciXux08ApgH9Hf6Cs9w7UiHG%2Fv1ETtMiWxKoiY57gwIdx02%2FlARn35sZ4v%2B1keUVn1%2BLqhX1sP7dx3JxyH0jDh1IMW3fJwuw81QsZmjb%2FNfDebyOcsu5k%2BLT3cr7BVnQmb%2BgaP6eow%2B72%2BF1Wpnfr4SwpyewfPO%2FpDqPARiOTZdIWIiPM2mYAzvPlvx44ALM5ar5tpOJ8V1%2BnukQ5BNfyB%2BgvjcvCVmSKERhJtdz1Pfha%2BWgg1m1tJx8FAZYB0upTnWdciGrYid%2Fbdy2RgS05J0YcT%2F%2FtybEU5%2FZSB3KQvUmzyhigwH37Khw%3D%3D&upload_id=ADPycduMF1RJ5geTNh8_dZPbLg-RErTnYfKHO2Hb1Y8imEn8UDn8SGy1z2dsiwvpUTcYrzBfoPGelINL5fm5urxJ6WrV4OfXyQ"
+    func uploadScreenRecord(videoUrl:URL){
+        print("uploadScreenRecord entered")
+        AF.upload(videoUrl, to: directUploadUrl, method: .put).responseJSON { response in
+            debugPrint(response)
+            print("Upload Print")
+            print(response)
+        }
+        
+    }
+//        recorder.stopRecording { [unowned self] (preview, error) in
+//
+////               self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Start", style: .Plain, target: self, action: "startRecording")
+////
+////               if let unwrappedPreview = preview {
+////                   unwrappedPreview.previewControllerDelegate = self
+////                   self.presentViewController(unwrappedPreview, animated: true, completion: nil)
+////               }
+//           }
+//       }
+    
     // Called when the RTMPStream or RTMPConnection changes status
     @objc
     private func rtmpStatusHandler(_ notification: Notification) {
